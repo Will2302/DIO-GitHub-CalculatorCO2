@@ -1,0 +1,16 @@
+body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f0f8f0; }
+.container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+h1 { color: #228B22; text-align: center; }
+.input-group { margin-bottom: 15px; }
+label { display: block; margin-bottom: 5px; font-weight: bold; }
+input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+button { background: #32CD32; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; }
+button:hover { background: #228B22; }
+.results { margin-top: 30px; padding: 20px; background: #e8f5e8; border-radius: 10px; }
+.hidden { display: none; }
+.bars { display: flex; justify-content: space-around; margin: 20px 0; }
+.bar { flex: 1; height: 40px; margin: 0 5px; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+.bike { background: #90EE90; }
+.car { background: #FF6347; }
+.bus { background: #FFA500; }
+.truck { background: #8B4513; }

@@ -1,0 +1,113 @@
+// Configurações globais [web:2]
+const CONFIG = {
+    EMISSION_FACTORS: { // kg CO2 por km [aproximações baseadas em dados reais]
+        bike: 0,
+        car: 0.25,
+        bus: 0.1,
+        truck: 0.15
+    },
+    CARBON_CREDIT: {
+        pricePerKg: 0.05 // R$ por kg CO2
+    },
+    DISTANCES: { // Exemplos de distâncias entre cidades BR (km)
+        'São Paulo': { 'Rio de Janeiro': 430 },
+        'São Paulo': { 'Belo Horizonte': 590 },
+        'Rio de Janeiro': { 'Belo Horizonte': 430 },
+        // Adicione mais rotas conforme necessário
+    },
+    TRANSPORT_MODES: [
+        { value: 'bike', label: '🚲 Bicicleta', color: '#90EE90' },
+        { value: 'car', label: '🚗 Carro', color: '#FF6347' },
+        { value: 'bus', label: '🚌 Ônibus', color: '#FFA500' },
+        { value: 'truck', label: '🚚 Caminhão', color: '#8B4513' }
+    ]
+};
+
+const cities = Object.keys(CONFIG.DISTANCES);
+const form = document.getElementById('tripForm');
+const results = document.getElementById('results');
+const originInput = document.getElementById('origin');
+const destInput = document.getElementById('destination');
+const distanceInput = document.getElementById('distance');
+const transportSelect = document.getElementById('transport');
+
+// Popula datalist e select
+function populateDatalist() {
+    const datalist = document.getElementById('cities');
+    cities.forEach(city => {
+        const option = document.createElement('option');
+        option.value = city;
+        datalist.appendChild(option);
+    });
+    TRANSPORT_MODES.forEach(mode => {
+        const option = document.createElement('option');
+        option.value = mode.value;
+        option.textContent = mode.label;
+        transportSelect.appendChild(option);
+    });
+}
+
+// Calcula distância
+function getDistance(origin, dest) {
+    return CONFIG.DISTANCES[origin]?.[dest] || null;
+}
+
+// Função principal de cálculo
+function calculateEmissions(distance, transport) {
+    const factor = CONFIG.EMISSION_FACTORS[transport];
+    const emission = (distance * factor).toFixed(2);
+    const credits = emission;
+    const cost = (credits * CONFIG.CARBON_CREDIT.pricePerKg).toFixed(2);
+    return { emission, credits, cost };
+}
+
+// Gera barras de comparação
+function generateBars(distance) {
+    const barsContainer = document.getElementById('bars');
+    barsContainer.innerHTML = '';
+    TRANSPORT_MODES.forEach(mode => {
+        const emissions = (distance * CONFIG.EMISSION_FACTORS[mode.value]).toFixed(2);
+        const bar = document.createElement('div');
+        bar.className = `bar ${mode.value}`;
+        bar.style.width = `${emissions * 10}px`; // Escala visual
+        bar.textContent = `${mode.value}: ${emissions}kg`;
+        barsContainer.appendChild(bar);
+    });
+}
+
+// Listeners
+originInput.addEventListener('input', updateDistance);
+destInput.addEventListener('input', updateDistance);
+
+function updateDistance() {
+    const origin = originInput.value;
+    const dest = destInput.value;
+    const dist = getDistance(origin, dest);
+    if (dist) {
+        distanceInput.value = dist;
+    } else {
+        distanceInput.value = '';
+    }
+}
+
+document.getElementById('manualDistance').addEventListener('click', () => {
+    distanceInput.removeAttribute('readonly');
+    distanceInput.focus();
+});
+
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const distance = parseFloat(distanceInput.value);
+    const transport = transportSelect.value;
+    if (!distance || !transport) return alert('Preencha todos os campos');
+
+    const { emission, credits, cost } = calculateEmissions(distance, transport);
+    document.getElementById('emission').textContent = emission;
+    document.getElementById('credits').textContent = `${credits} kg`;
+    document.getElementById('cost').textContent = cost;
+    generateBars(distance);
+    results.classList.remove('hidden');
+});
+
+// Inicializa
+populateDatalist();
